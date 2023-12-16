@@ -143,3 +143,24 @@ auditpol /set /subcategory:"Security System Extension" /success:enable | Out-Nul
 
 # windows settings
 Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" -Name NoLockScreenSlideshow -Value 1 # disable lockscreen slideshow
+if ((Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization") -ne $true) {
+    New-Item "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization" -Force | Out-Null
+}
+Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization" -Name AllowInputPersonalization -Value 0 # speech inking and typing can send sensitive information to microsoft
+Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name AllowOnlineTips -Value 0 # sends data to 3rd party
+
+#####################
+# Network Hardening #
+#####################
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" -Name NodeType -Value 2 # put netbios into P-node mode to mitigate netbios poisoning attacks
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" -Name DisableIPSourceRouting -Value 2 # disable source routing
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name DisableIPSourceRouting -Value 2 # disable source routing
+Set-ItemProperty "HKLM:\System\CurrentControlSet\Services\RasMan\Parameters" -Name DisableSavePassword -Value 1 # do not save dial up passwords for connections
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name EnableICMPRedirect -Value 0 # icmp ping requests can override ospf paths, disable
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name KeepAliveTime -Value 300000 # send keep alive packets in 5 min intervals
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name PerformRouterDiscovery -Value 0 # disable internet router discovery protocol
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" -Name TcpMaxDataRetransmissions -Value 3 # dynamically determine timmeout value of unacknowledged packets 
+
+
+
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" -Name DisableExceptionChainValidation -Value 0 # block Structured Exception  Handler (SEH) overwrite exploits
