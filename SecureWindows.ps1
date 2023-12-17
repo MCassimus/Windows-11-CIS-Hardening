@@ -28,7 +28,7 @@ net accounts /lockoutwindow:15 | Out-Null # unlock after 15 minutes
 Set-ItemProperty "HKLM:\System\CurrentControlSet\Control\SAM" -Name RelaxMinimumPasswordLengthLimits  -Value 1 # This setting will enable the enforcement of longer and generally stronger passwords or passphrases where MFA is not in use.
 
 Write-Host "    Configuring login/logout features"
-#Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name NoConnectedUser -Value 3 # Disables microsoft accounts from being logged in for user accounts
+Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name NoConnectedUser -Value 3 # Disables microsoft accounts from being logged in for user accounts
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name DisableCAD -Value 0 # Require Ctrl + Alt + Del on login
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name DontDisplayLastUserName -Value 1 # Dont display the last logged in user
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name LegalNoticeText -Value "Authorized users only." # Display a login banner
@@ -142,6 +142,9 @@ auditpol /set /subcategory:"IPsec Driver" /success:enable /failure:enable | Out-
 auditpol /set /subcategory:"Security System Extension" /success:enable | Out-Null # reports the loading of extension code such as authentication packages by the security subsystem
 
 # windows settings
+if ((Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization") -ne $true) {
+    New-Item "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" -Force | Out-Null
+}
 Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" -Name NoLockScreenSlideshow -Value 1 # disable lockscreen slideshow
 if ((Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization") -ne $true) {
     New-Item "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization" -Force | Out-Null
